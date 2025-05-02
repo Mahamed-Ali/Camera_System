@@ -28,3 +28,5 @@ Timestamp,Short Message,Long Message,Log Type
 2025-05-02 17:58:35.129141,Recording on,24/7 recording enabled,recording247
 2025-05-02 17:59:42.863361,Camera unflipped,Camera orientation set to normal,fliporientation
 2025-05-02 17:59:56.258988,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-02_17-59-56.motion.mp4,motion
+2025-05-02 19:08:50.479724,Logging disabled,Activity logging turned off,logging
+2025-05-02 19:11:33.443053,Logging enabled,Activity logging turned on,logging

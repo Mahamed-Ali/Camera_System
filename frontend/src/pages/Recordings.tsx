@@ -11,15 +11,12 @@ export default function Recordings() {
   const [recordings, setRecordings] = useState<Recording[]>([])
 
   useEffect(() => {
-    fetch("/recordings/recordings.json") // لازم يكون فيه فولدر اسمه recordings في public
+    fetch("/recordings") // بدل recordings.json
       .then((res) => res.json())
       .then((data) => setRecordings(data))
       .catch(() => setRecordings([]))
   }, [])
-  fetch("/recordings/recordings.json")
-  .then(res => res.json())
-  .then(data => setRecordings(data))
-
+  
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-red-600">📼 Recordings</h2>

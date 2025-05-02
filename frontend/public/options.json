@@ -3,7 +3,7 @@
     "linelimit": 0,
     "recording247": true,
     "motiondetection": true,
-    "fliporientation": false,
+    "fliporientation": true,
     "shape": null,
     "schedule": null,
     "motionwait": 5,
