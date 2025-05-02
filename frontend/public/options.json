@@ -1,0 +1,16 @@
+{
+    "logging": true,
+    "linelimit": 0,
+    "recording247": true,
+    "motiondetection": true,
+    "fliporientation": false,
+    "shape": null,
+    "schedule": null,
+    "motionwait": 5,
+    "motionrecordto": 10,
+    "contourareathreshold": 3000,
+    "resolution": [
+        640,
+        480
+    ]
+}

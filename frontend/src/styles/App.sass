@@ -1,0 +1,97 @@
+@import 'Content.sass'
+	
+section#content
+	@apply w-full h-full
+
+section#content>*
+	margin: 40px 3% 4.5% 3%
+		
+.switch
+	width: 18px!important
+	height: 10px!important
+	transform: translate(-10px, 6px)!important
+	&[data-state=unchecked]
+		transform: translate(-1px, 6px)!important
+
+	&>span
+		width: 14.50px!important
+		height: 14.50px!important
+		// transform: translate(10px, 6px)!important
+		transform: translateX(10px)!important
+		&[data-state=unchecked]
+			transform: translateX(-10px)!important
+
+.draggable
+	cursor: grab
+	&:active
+		cursor: grabbing
+
+.info-popup
+	transform: scale(.85) translateY(0px)
+	cursor: pointer
+	margin-left: 8px
+	@supports (-moz-appearance:none)
+		transform: scale(0.80) translate(1px, 1px)
+	&:not(:hover)
+		opacity: .5
+
+.input // .t2
+	// box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(255, 255, 255, 0.15) 0px 0px 0px 1px, rgba(0, 0, 0, 0.03) 0px 0.8px 2px 0px, rgba(0, 0, 0, 0.048) 0px 2.7px 6.7px 0px, rgba(0, 0, 0, 0.08) 0px 12px 30px 0px !important
+	border: 1px solid !important
+	@apply border-[#00000075] dark:border-[#ffffff26] #{!important}
+
+.content-popup
+	@apply top-0 left-0 w-full h-full fixed z-50 place-content-center grid
+	>.wrapper
+		@apply grid place-content-center z-10
+		box-shadow: rgb(0 0 0 / 28%) 0px 7px 65px 0px
+	>.overlay
+		@apply top-0 left-0 w-full h-full fixed bg-[#0000008a]
+	.close-btn
+		place-self: end
+		transform: translate(-4px, 27px)
+		z-index: 1
+
+.status.processing::after
+	@apply animate-[pulse_1s_infinite] bg-[#ff1900] dark:bg-[#ff3800] p-0 rounded-[100%] block
+	content: ""
+	float: left
+	transform: translate(0px, 5px)
+	margin-right: 6px
+	width: 7px
+	height: 7px
+
+body
+	@keyframes pulsing
+		50%
+			opacity: 0 // 'pulse' uses .5
+
+.main-overlay
+	@apply bg-background fixed top-0 left-0 w-screen h-screen z-50 grid place-content-center
+	animation: loader-an2 4s ease-in-out forwards
+
+	&:empty
+		display: none
+
+	.loader
+		animation: loader-an 4s ease-in-out forwards
+		@keyframes loader-an
+			0%
+				opacity: 0
+			15%
+				opacity: 1
+				transform: scale(1.5)
+			30%
+				opacity: 1
+				transform: scale(1.5)
+			40%, 100%
+				opacity: 1
+				transform: scale(0)
+
+	@keyframes loader-an2
+		0%, 30%
+			opacity: 1
+			visibility: visible
+		50%, 100%
+			opacity: 0
+			visibility: hidden

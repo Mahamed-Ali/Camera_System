@@ -1,0 +1,7 @@
+# Install all packages through apt or default package manager if possible
+
+flask
+flask-socketio
+# pycamera2
+python-dotenv
+moviepy

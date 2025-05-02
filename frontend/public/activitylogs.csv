@@ -1,0 +1,30 @@
+Timestamp,Short Message,Long Message,Log Type
+2025-04-30 20:30:21.287360,System shutdown,System shutdown initiated by user,poweroff
+2025-04-30 23:43:50.072404,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-04-30 23:43:51.784057,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-04-30_23-43-51.motion.mp4,motion
+2025-04-30 23:43:54.251938,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-04-30 23:43:56.463324,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-04-30 23:44:09.177328,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-01 21:36:34.820026,Logging enabled,Activity logging turned on,logging
+2025-05-01 21:36:34.824062,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-01 21:36:35.053752,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-01 21:36:35.062115,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-01 21:36:35.074775,Logging disabled,Activity logging turned off,logging
+2025-05-01 21:41:33.262298,Logging enabled,Activity logging turned on,logging
+2025-05-01 21:41:37.082125,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-01 21:41:40.048442,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-02 00:42:23.562551,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-02 00:42:29.231985,Recording on,24/7 recording enabled,recording247
+2025-05-02 00:42:39.694959,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-02 00:43:39.841222,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-02 00:44:10.901268,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-02 11:07:45.016279,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-02_11-07-44.motion.mp4,motion
+2025-05-02 11:08:15.768266,Logging disabled,Activity logging turned off,logging
+2025-05-02 11:08:28.059122,Logging enabled,Activity logging turned on,logging
+2025-05-02 11:08:29.278739,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-02 17:58:35.095816,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-02 17:58:35.113518,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-02 17:58:35.122417,Logging enabled,Activity logging turned on,logging
+2025-05-02 17:58:35.129141,Recording on,24/7 recording enabled,recording247
+2025-05-02 17:59:42.863361,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-02 17:59:56.258988,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-02_17-59-56.motion.mp4,motion

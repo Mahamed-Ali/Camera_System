@@ -1,0 +1,66 @@
+aside
+	@apply bg-background2 dark:shadow-none shadow-xl overflow-auto [--nav-size:330px] min-w-[--nav-size,330px] max-w-[--nav-size,330px] p-[43px_38px_0_38px]
+	
+	.options
+		@apply flex justify-between
+
+	.options >*
+		@apply w-full
+		h1 // Option title
+			@apply relative ml-[25px] opacity-50 text-[14px] capitalize my-[25px] mb-[20px]
+
+		.content // Options box
+			@apply bg-background3 p-7 rounded-[15px] py-[19px] px-[28px]
+
+			.item // Option item (possibly text and checkbox)
+				@apply flex justify-between
+				&~.item
+					@apply my-[20px]
+				&:last-of-type
+						@apply mb-0
+
+	.options.no-bg .content
+		@apply pt-0 px-0 bg-[#00000000]
+
+		.item
+			@apply my-0 py-[10px] px-[26px] rounded-[10px] cursor-pointer gap-[20px]
+			*
+				transition: transform .3s ease
+				white-space: nowrap
+			&:hover
+				@apply bg-background-hover
+			&.active
+				@apply bg-background3
+
+	.options.multiple .content
+		@apply py-[25px]
+
+	.options.last .content .item
+		flex-direction: row-reverse
+		justify-content: left
+		gap: 22px
+
+// Filled switches
+.switch
+	border: none !important
+	background: var(--object-color-muted) !important
+	&[data-state="checked"]
+		background: var(--object-color-secondary) !important
+		&>span
+			background: var(--object-color-primary) !important
+			@at-root :not(.light) &
+				transform: translateX(11px) !important
+
+.side-toggle
+	@apply dark:bg-[#2e2e33] bg-[#d1d1d1] dark:text-[#d1d1d1] text-[#2e2e33]
+	top: 50%
+	width: 50px
+	height: 50px
+	position: absolute
+	border-radius: 100%
+	cursor: pointer
+	left: calc(330px - 23px)
+	transition: opacity .3s ease
+	transform: translateY(-50%)
+	box-shadow: rgb(0 0 0 / 4%) 0px 7px 29px 0px
+	z-index: 1

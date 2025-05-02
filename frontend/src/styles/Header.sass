@@ -1,0 +1,84 @@
+nav:first-of-type
+    &.compact
+        place-items: center
+        justify-content: start
+        gap: 50px
+    .option
+        &.power svg
+            width: 16px!important
+            height: 16px!important
+            transform: scale(1.15)!important
+
+nav:first-of-type
+    @apply flex justify-between mb-[30px] gap-[20px] relative /* mr-[5%] */
+
+nav:first-of-type .nav-lists .nav-link
+    @apply p-[10px] rounded-[100%] bg-[#00000016] dark:bg-background2
+
+nav:first-of-type .nav-lists time.nav-link
+    @apply px-[20px] rounded-[200px] text-[85%]
+
+nav:first-of-type :is(.nav-lists, .nav-viewport) .rec
+    @apply w-[10px] h-[10px] p-0 rounded-[100%]
+    &.live
+        @apply animate-[pulse_1s_infinite] bg-[#ff1900] dark:bg-[#ff3800]
+
+nav:first-of-type .nav-lists .option>button
+    all: unset
+    display: flex
+    &>svg:not(.icon)
+        @apply hidden
+
+// Nav content popup
+nav:first-of-type .nav-viewport
+    position: absolute
+    right: 0
+    flex-direction: column
+    float: right
+    left: auto
+    width: fit-content !important
+    transform: translate(0, 15px)
+    border-radius: 10px
+    z-index: 5
+    @apply bg-[#3b3b3f73] text-[14px] text-[#fff] backdrop-blur-[5px]
+    .nav-content
+        width: 100%
+        position: relative
+    [data-state]
+        width: 100%
+        background: none
+        margin-top: 0
+        .nav-content-options
+            padding: 15px
+            .option
+                backdrop-filter: blur(5px)
+                background-color: #00000085
+                border-radius: 10px
+                margin: 4px 0
+                margin: 10px 0
+                @at-root .dark &
+                    background-color: #00000060
+                    background-color: #00000067
+            .option:first-of-type
+                    margin-top: 0
+            .option:last-of-type
+                    margin-bottom: 0
+            .option> section
+                    padding: 13px
+                    padding: 13px 13px 12px 13px
+                    display: flex
+                    place-items: center
+                    gap: 8px
+                    .icon-wrapper
+                        transform: translateY(-1.5px)
+                    &:last-of-type:not(:first-of-type)
+                        opacity: .5
+                        padding-top: 0
+            .option time
+                margin-left: 5px
+            @at-root &.power-options .option:hover
+                background-color: #0000008a
+
+.notifications.new:after
+    @apply bg-[#ff1900] dark:bg-[#e75c51] p-0 rounded-[100%] block absolute w-[6px] h-[6px] content-[""] text-[80%] leading-[0]
+    transform: translate(22px, -28px)
