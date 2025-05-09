@@ -1,15 +1,5 @@
 import { useEffect, useState } from "react"
-import {
-  Camera,
-  WifiOff,
-  Wifi,
-  Clock,
-  CameraOff,
-  CameraIcon,
-  Play,
-  Pause,
-  Camera as SnapshotIcon,
-} from "lucide-react"
+import { Camera, WifiOff, Wifi, Clock, CameraOff, CameraIcon, Play, Pause, Camera as SnapshotIcon } from "lucide-react"
 
 export default function Home() {
   const [streaming, setStreaming] = useState(false)
@@ -17,12 +7,9 @@ export default function Home() {
   const [startTime, setStartTime] = useState<Date | null>(null)
   const [elapsedTime, setElapsedTime] = useState("00:00:00")
 
-  // تحديد اللون حسب الحالة
-  const statusColor = streaming && connected ? "text-green-500" : "text-red-500"
-
   useEffect(() => {
     const pingServer = () => {
-      fetch("http://127.0.0.1:5000/", { method: "GET" })
+      fetch("/api/")
         .then(() => setConnected(true))
         .catch(() => setConnected(false))
     }
@@ -55,7 +42,7 @@ export default function Home() {
 
   const handleSnapshot = () => {
     const a = document.createElement('a')
-    a.href = 'http://127.0.0.1:5000/video_feed'
+    a.href = '/api/feed'
     a.download = `snapshot_${Date.now()}.jpg`
     a.click()
   }
@@ -63,22 +50,22 @@ export default function Home() {
   return (
     <div className="p-6">
       <div className="w-full flex justify-center">
-        <h1 className={`text-3xl font-extrabold mb-6 flex items-center gap-2 ${statusColor}`}>
-          <Camera className="text-inherit text-4xl" />
+        <h1 className="text-red-500 text-3xl font-extrabold mb-6 flex items-center gap-2">
+          <Camera className="text-red-500 text-4xl" />
           Live Camera View
         </h1>
       </div>
 
-      <div className={`flex justify-center gap-6 mb-4 text-sm ${statusColor}`}>
+      <div className="flex justify-center gap-6 mb-4 text-sm text-red-500">
         <span className="flex items-center gap-1">
-          {connected ? <Wifi className="text-inherit" size={16} /> : <WifiOff className="text-inherit" size={16} />}
+          {connected ? <Wifi className="text-red-500" size={16} /> : <WifiOff className="text-red-500" size={16} />}
           {connected ? "Connected" : "Disconnected"}
         </span>
         <span className="flex items-center gap-1">
           <Clock size={16} /> {elapsedTime}
         </span>
         <span className="flex items-center gap-1">
-          {streaming ? <CameraIcon size={16} /> : <CameraOff size={16} />}
+          {streaming ? <CameraIcon size={16} className="text-green-500" /> : <CameraOff size={16} className="text-red-500" />}
           {streaming ? "Live" : "Paused"}
         </span>
       </div>
@@ -86,7 +73,7 @@ export default function Home() {
       <div className="bg-black rounded-xl w-full max-w-5xl mx-auto shadow-lg h-[400px] flex items-center justify-center">
         {streaming ? (
           <img
-            src="http://127.0.0.1:5000/video_feed"
+            src="/api/feed"
             alt="Live camera feed"
             className="rounded-lg mx-auto"
           />

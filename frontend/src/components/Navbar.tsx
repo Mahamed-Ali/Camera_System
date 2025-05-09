@@ -16,11 +16,12 @@ export default function Navbar() {
 
   return (
     <header className="p-4 shadow bg-black text-white flex justify-between items-center">
-      <div className="text-xl font-bold tracking-wide">🔒 Smart Camera</div>
+      <div className="text-xl font-bold tracking-wide"> Smart Camera</div>
       <nav className="flex gap-4 items-center">
         <Link to="/" className={linkClasses('/')}> <Home size={18} /> Home </Link>
         <Link to="/settings" className={linkClasses('/settings')}> <Settings size={18} /> Settings </Link>
         <Link to="/recordings" className={linkClasses('/recordings')}> <Camera size={18} /> Recordings </Link>
+
 
         {/* Logs Drawer Trigger */}
         <Drawer>

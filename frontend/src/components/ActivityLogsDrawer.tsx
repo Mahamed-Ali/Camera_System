@@ -1,230 +1,59 @@
-import '../styles/ActivityLogsDrawer.sass'
-
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion"
-import { DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "./ui/drawer"
-import { useUIOptions } from './context-providers/ui-configs';
-import { formatMessage, logIcon, readableDate } from '../utils/utils'
-import { socket } from '../utils/socket';
+import { DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "./ui/drawer"
 import { Button } from "./ui/button"
+import { useUIOptions } from "./context-providers/ui-configs"
+import { formatMessage, logIcon, readableDate } from "../utils/utils"
 
 export default function ActivityLogs() {
-    const { uiOptions } = useUIOptions();
+  const { uiOptions, setUIOptions } = useUIOptions()
 
-    return (
-        // <DrawerContent className='logs-content'>
-<DrawerContent className="logs-content w-[400px] fixed right-0 top-0 h-full  z-50 shadow-xl p-6 overflow-y-auto animate-slide-in-from-right">
+  // Dummy logs للتجربة
+  const logs = uiOptions.logs?.length ? uiOptions.logs : [
+    { timestamp: new Date().toISOString(), shortMessage: "Web server auto-started", longMessage: "⚡ Started automatically", logType: "autostart" },
+    { timestamp: new Date().toISOString(), shortMessage: "Device powered off", longMessage: "⏻ Shut down safely", logType: "poweroff" },
+    { timestamp: new Date().toISOString(), shortMessage: "Device restarted", longMessage: "🔁 Restarted by admin", logType: "reboot" },
+    { timestamp: new Date().toISOString(), shortMessage: "Motion detected", longMessage: "🎯 Motion in hallway", logType: "motiondetection" },
+    { timestamp: new Date().toISOString(), shortMessage: "Logging turned off", longMessage: "📜 Disabled by user", logType: "logging" },
+    { timestamp: new Date().toISOString(), shortMessage: "Recording on", longMessage: "📹 24/7 recording started", logType: "recording247" },
+    { timestamp: new Date().toISOString(), shortMessage: "Scheduled recording enabled", longMessage: "⏰ Recording scheduled 12–1 PM", logType: "schedule" }
+  ]
 
+  return (
+    <DrawerContent className="logs-content w-[400px] fixed right-0 top-0 h-full z-50 shadow-xl p-6 overflow-y-auto bg-white dark:bg-zinc-900">
+      <DrawerHeader className="gap-2 mb-4">
+        <DrawerTitle className="text-xl font-bold text-red-600">Activity Logs</DrawerTitle>
+        <DrawerDescription className="text-gray-500 dark:text-gray-400">Most recent logs are shown first.</DrawerDescription>
+      </DrawerHeader>
 
+      <Accordion type="single" collapsible className="space-y-2 px-2 max-h-[65vh] overflow-y-auto">
+        {logs.map((log, i) => (
+          <AccordionItem key={i} value={`item-${i}`} className="border rounded-md bg-gray-50 dark:bg-zinc-800">
+            <AccordionTrigger className="p-3">
+              <div className="flex gap-2 items-center">
+                <div className="text-red-600">{logIcon(log.logType)}</div>
+                <div className="flex flex-col text-left">
+                  <span className="font-medium">{log.shortMessage}</span>
+                  <time className="text-xs text-gray-500">at {readableDate(log.timestamp)}</time>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-3 text-sm text-gray-700 dark:text-gray-300">
+              {formatMessage(log.longMessage)}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
 
-            <DrawerHeader className='gap-[20px] mb-2'>
-                <DrawerTitle>Activity logs</DrawerTitle>
-                <DrawerDescription>Most recent logs are shown first</DrawerDescription>
-            </DrawerHeader>
-            <Accordion type="single" collapsible className="mx-[20px] overflow-y-auto max-h-[60vh]">
-                {uiOptions.logs?.map((log, i) => (
-                    <AccordionItem key={i} value={`item-${i}`}>
-                        <AccordionTrigger>
-                            <div className="log-item">
-                                <section>
-                                    <div className='icon-wrapper'>
-                                        {logIcon(log.logType)}
-                                    </div>
-                                    <div>
-                                        <span>{log.shortMessage}</span>
-                                        <time className='opacity-50'>at {readableDate(log.timestamp)}</time>
-                                    </div>
-                                </section>
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="mx-[20px]">
-                            {formatMessage(log.longMessage)}
-                        </AccordionContent>
-                    </AccordionItem>
-                ))}
-            </Accordion>
-            <DrawerFooter>
-                <DrawerClose>
-                    <Button variant="link" onClick={() => socket.emit('clear-logs')}>Clear logs</Button>
-                </DrawerClose>
-            </DrawerFooter>
-        </DrawerContent>
-    )
-
-    return (
-        <DrawerContent className='logs-content template hidden'>
-            <DrawerHeader className='gap-[20px] mb-2'>
-                <DrawerTitle>Activity logs</DrawerTitle>
-                <DrawerDescription>Click on a log message to view more details.</DrawerDescription>
-            </DrawerHeader>
-            <Accordion type="single" collapsible className="mx-[20px] overflow-y-auto mh-[70vh]">
-                <AccordionItem value="item-0">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('autostart')}
-                                </div>
-                                <div>
-                                    <span>Web server auto-started</span>
-                                    <time className='opacity-50'>at 23:53 on June 15 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Web server was started automatically after reboot.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-1">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('poweroff')}
-                                </div>
-                                <div>
-                                    <span>Device powered off</span>
-                                    <time className='opacity-50'>at 23:53 on June 15 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Device was powered off through the dashboard.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('reboot')}
-                                </div>
-                                <div>
-                                    <span>Device restarted</span>
-                                    <time className='opacity-50'>at 21:43 on April 1 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Device was restarted through the dashboard.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('motiondetection')}
-                                </div>
-                                <div>
-                                    <span>Motion detected</span>
-                                    <time className='opacity-50'>at 21:43 on April 1 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Motion was detected.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-4">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('logging')}
-                                </div>
-                                <div>
-                                    <span>Activity logging turned off</span>
-                                    <time className='opacity-50'>at 21:42 on April 1 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Activity logging was disabled through the dashboard.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-5">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('logging')}
-                                </div>
-                                <div>
-                                    <span>Activity logging turned on</span>
-                                    <time className='opacity-50'>at 21:43 on April 1 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Activity logging was enabled through the dashboard.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-6">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('recording247')}
-                                </div>
-                                <div>
-                                    <span>Recording on</span>
-                                    <time className='opacity-50'>at 21:43 on April 1 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Recording turned on through the dashboard.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-7">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('recording247')}
-                                </div>
-                                <div>
-                                    <span>Recording off</span>
-                                    <time className='opacity-50'>at 21:43 on April 1 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Recording turned off through the dashboard.
-                    </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-8">
-                    <AccordionTrigger>
-                        <div className="log-item">
-                            <section>
-                                <div className='icon-wrapper'>
-                                    {logIcon('schedule')}
-                                </div>
-                                <div>
-                                    <span>Scheduled recording enabled</span>
-                                    <time className='opacity-50'>at 21:43 on April 1 2024</time>
-                                </div>
-                            </section>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="mx-[20px]">
-                        Automatic recording enabled at 12:00 PM to 1:00 PM.
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-            <DrawerFooter>
-                <DrawerClose>
-                    <Button variant="link">Close</Button>
-                </DrawerClose>
-            </DrawerFooter>
-        </DrawerContent>
-    )
+      {/* زر Clear Logs في المنتصف */}
+      <div className="flex justify-center mt-6">
+        <Button
+          variant="ghost"
+          className="bg-red-600 text-white hover:bg-red-700 transition duration-300 hover:scale-105"
+          onClick={() => setUIOptions({ ...uiOptions, logs: [] })}
+        >
+          Clear Logs
+        </Button>
+      </div>
+    </DrawerContent>
+  )
 }
