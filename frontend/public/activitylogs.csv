@@ -1,39 +1,50 @@
 Timestamp,Short Message,Long Message,Log Type
-2025-04-30 20:30:21.287360,System shutdown,System shutdown initiated by user,poweroff
-2025-04-30 23:43:50.072404,Motion detection enabled,Motion detection is turned on,motiondetection
-2025-04-30 23:43:51.784057,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-04-30_23-43-51.motion.mp4,motion
-2025-04-30 23:43:54.251938,Motion detection disabled,Motion detection is turned off,motiondetection
-2025-04-30 23:43:56.463324,Motion detection enabled,Motion detection is turned on,motiondetection
-2025-04-30 23:44:09.177328,Motion detection disabled,Motion detection is turned off,motiondetection
-2025-05-01 21:36:34.820026,Logging enabled,Activity logging turned on,logging
-2025-05-01 21:36:34.824062,Motion detection enabled,Motion detection is turned on,motiondetection
-2025-05-01 21:36:35.053752,Camera flipped,Camera orientation flipped,fliporientation
-2025-05-01 21:36:35.062115,Camera unflipped,Camera orientation set to normal,fliporientation
-2025-05-01 21:36:35.074775,Logging disabled,Activity logging turned off,logging
-2025-05-01 21:41:33.262298,Logging enabled,Activity logging turned on,logging
-2025-05-01 21:41:37.082125,Camera flipped,Camera orientation flipped,fliporientation
-2025-05-01 21:41:40.048442,Camera unflipped,Camera orientation set to normal,fliporientation
-2025-05-02 00:42:23.562551,Camera flipped,Camera orientation flipped,fliporientation
-2025-05-02 00:42:29.231985,Recording on,24/7 recording enabled,recording247
-2025-05-02 00:42:39.694959,Camera unflipped,Camera orientation set to normal,fliporientation
-2025-05-02 00:43:39.841222,Motion detection disabled,Motion detection is turned off,motiondetection
-2025-05-02 00:44:10.901268,Motion detection enabled,Motion detection is turned on,motiondetection
-2025-05-02 11:07:45.016279,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-02_11-07-44.motion.mp4,motion
-2025-05-02 11:08:15.768266,Logging disabled,Activity logging turned off,logging
-2025-05-02 11:08:28.059122,Logging enabled,Activity logging turned on,logging
-2025-05-02 11:08:29.278739,Motion detection enabled,Motion detection is turned on,motiondetection
-2025-05-02 17:58:35.095816,Camera flipped,Camera orientation flipped,fliporientation
-2025-05-02 17:58:35.113518,Motion detection enabled,Motion detection is turned on,motiondetection
-2025-05-02 17:58:35.122417,Logging enabled,Activity logging turned on,logging
-2025-05-02 17:58:35.129141,Recording on,24/7 recording enabled,recording247
-2025-05-02 17:59:42.863361,Camera unflipped,Camera orientation set to normal,fliporientation
-2025-05-02 17:59:56.258988,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-02_17-59-56.motion.mp4,motion
-2025-05-02 19:08:50.479724,Logging disabled,Activity logging turned off,logging
-2025-05-02 19:11:33.443053,Logging enabled,Activity logging turned on,logging
-2025-05-02 19:56:31.128165,Camera unflipped,Camera orientation set to normal,fliporientation
-2025-05-02 19:58:14.955280,Recording on,24/7 recording enabled,recording247
-2025-05-04 11:41:59.323660,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-04_11-41-59.motion.mp4,motion
-2025-05-04 11:43:12.478000,Logging disabled,Activity logging turned off,logging
-2025-05-04 11:43:34.056095,Logging enabled,Activity logging turned on,logging
-2025-05-04 11:43:35.326250,Recording on,24/7 recording enabled,recording247
-2025-05-05 08:51:06.438911,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-05_08-51-06.motion.mp4,motion
+2025-05-10 19:31:42.875052,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-10_19-31-42.motion.mp4,motion
+2025-05-10 19:32:10.149092,Recording on,24/7 recording enabled,recording247
+2025-05-10 19:33:21.170877,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-10 19:33:54.693057,Logging disabled,Activity logging turned off,logging
+2025-05-10 19:43:11.761233,Logging enabled,Activity logging turned on,logging
+2025-05-10 19:43:21.715846,Recording on,24/7 recording enabled,recording247
+2025-05-10 19:45:04.275333,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-10 19:45:17.000756,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-10 19:59:02.422217,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-10_19-59-02.motion.mp4,motion
+2025-05-10 19:59:02.425227,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-10_19-59-02.motion.mp4,motion
+2025-05-10 20:03:25.420358,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-10_20-03-25.motion.mp4,motion
+2025-05-10 20:03:54.813490,Recording off,24/7 recording disabled,recording247
+2025-05-10 20:03:56.407782,Recording on,24/7 recording enabled,recording247
+2025-05-11 12:56:59.638839,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-11 12:57:15.523440,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-11 14:02:58.168770,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-11 14:15:04.531328,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-11 14:15:05.768551,Recording on,24/7 recording enabled,recording247
+2025-05-11 14:15:25.574336,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-11 14:15:26.428084,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-11 14:15:49.734045,Added privacy zone,Privacy zone shape added,shape
+2025-05-11 14:16:14.431001,Recording off,24/7 recording disabled,recording247
+2025-05-11 14:17:13.651729,Recording on,24/7 recording enabled,recording247
+2025-05-11 14:18:01.681617,Recording off,24/7 recording disabled,recording247
+2025-05-11 14:34:09.943949,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-11_14-34-09.motion.mp4,motion
+2025-05-11 14:56:09.121525,Recording on,24/7 recording enabled,recording247
+2025-05-11 14:56:39.127294,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-11_14-56-39.motion.mp4,motion
+2025-05-11 14:58:02.521071,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-11 14:58:03.337189,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-11 14:58:57.905363,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-11 14:59:04.261842,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-11 15:09:46.203336,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-11 15:09:56.209518,Recording on,24/7 recording enabled,recording247
+2025-05-11 15:10:19.632427,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-11_15-10-19.motion.mp4,motion
+2025-05-11 15:10:19.638741,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-11_15-10-19.motion.mp4,motion
+2025-05-11 15:10:19.646249,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-11_15-10-19.motion.mp4,motion
+2025-05-11 15:10:30.195491,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-11 15:12:05.580897,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-11 15:12:19.270676,Logging disabled,Activity logging turned off,logging
+2025-05-11 15:17:19.079199,Logging enabled,Activity logging turned on,logging
+2025-05-11 15:17:57.555628,Motion detection disabled,Motion detection is turned off,motiondetection
+2025-05-11 15:20:18.851932,Recording off,24/7 recording disabled,recording247
+2025-05-11 15:20:30.809975,Recording on,24/7 recording enabled,recording247
+2025-05-11 15:25:48.169791,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-11 16:57:39.681197,Motion detection enabled,Motion detection is turned on,motiondetection
+2025-05-11 17:00:43.303152,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-11_17-00-43.motion.mp4,motion
+2025-05-11 17:49:34.355561,Camera flipped,Camera orientation flipped,fliporientation
+2025-05-11 17:50:18.196101,Camera unflipped,Camera orientation set to normal,fliporientation
+2025-05-11 18:48:38.583670,Motion detected.,Motion detected and 10 seconds of it recorded to 2025-05-11_18-48-38.motion.mp4,motion

@@ -9,7 +9,7 @@ load_dotenv()
 static_folder = path.abspath("frontend/public")
 log_file = path.join(static_folder, "activitylogs.csv")
 options_file = path.join(static_folder, "options.json")
-recordings_dir = path.join(static_folder, "recordings")
+recordings_dir = path.abspath("frontend/public/recordings")
 
 # Make sure recordings directory exists
 makedirs(recordings_dir, exist_ok=True)

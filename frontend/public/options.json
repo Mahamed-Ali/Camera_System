@@ -1,10 +1,23 @@
 {
     "logging": true,
     "linelimit": 0,
-    "recording247": true,
+    "recording247": false,
     "motiondetection": true,
     "fliporientation": false,
-    "shape": null,
+    "shape": {
+        "x": 38,
+        "y": 57,
+        "width": 45,
+        "height": 37,
+        "radius": 10,
+        "blur": 10,
+        "hsva": {
+            "h": 218,
+            "s": 100,
+            "v": 63,
+            "a": 0.5
+        }
+    },
     "schedule": null,
     "motionwait": 5,
     "motionrecordto": 10,

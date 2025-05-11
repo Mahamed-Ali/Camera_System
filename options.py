@@ -11,7 +11,7 @@ class Options:
         self.shape: dict = None
         self.schedule: dict = None
         self.motionwait: int = 5 # seconds
-        self.motionrecordto: int = 10 # seconds
+        self.motionrecordto = 10 # seconds
         self.contourareathreshold = 3000 # roughly thumb size?
         self._default_res = 640, 480
         self.resolution = self._default_res

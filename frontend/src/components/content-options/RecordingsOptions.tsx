@@ -89,7 +89,7 @@ function Recording({ recordings, setRecordings }: IRecording) {
 	}
 
 	function deleteRecording(filename: string): void {
-		fetch(`/api/videos/delete/${filename}`,)
+		fetch(`/api/videos/delete/${filename}`, { method: 'DELETE' })
 			.then(response => response.json())
 			.then(data => {
 				if (data.message)
@@ -118,9 +118,9 @@ function Recording({ recordings, setRecordings }: IRecording) {
 
 				return (
 					<div key={index} className={clsx('recording flex gap-[13px] place-items-center rounded-[15px] px-[13px] py-[15px] overflow-hidden cursor-default bg-[--bg] transition-[.3s_ease] t2 min-h-[92px] h-auto object-cover', { 'cursor-pointer hover:brightness-[.97] hover:dark:brightness-[.9]': readable })} onClick={(e) => startPlaying(recording.filename, readable, e)}>
-						{readable && <img src={`/api/recordings/thumbnails/${recording.thumbnail}`} className="w-[80px] h-auto h-full object-cover rounded-[5px] shadow-[#0000002b_0px_6px_13px_-6px] t2" />}
+						{readable && <img src={`/api/recordings/thumbnails/${recording.thumbnail}`} className="w-[80px] h-auto h-full object-cover rounded-[5px] shadow-[#0000002b_0px_6px_13px_-6px] t2" alt="Recording thumbnail" />}
 						{readable && <Icon.PlayFill className='absolute translate-x-[25px] w-[30px] h-auto' />}
-						{!readable && <img className="w-[80px] h-auto h-full object-cover rounded-[5px] shadow-[#0000002b_0px_6px_13px_-6px] t2 invisible" />}
+						{!readable && <img className="w-[80px] h-auto h-full object-cover rounded-[5px] shadow-[#0000002b_0px_6px_13px_-6px] t2 invisible" alt="No thumbnail" />}
 						{recording.processing &&
 							<svg className='absolute translate-x-[25px] w-[25px] h-auto' fill='currentColor' xmlns="http://www.w3.org/2000/svg" version="1.1" xmlnsXlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 465.2 465.2" xmlSpace="preserve">
 								<g>

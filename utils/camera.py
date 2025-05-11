@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
+import os
+import logging
 
 from enum import Enum
 from time import sleep
-from threading import Thread
+from threading import Thread, Lock
 from datetime import datetime
 from typing import Callable
 from options import options
@@ -11,6 +13,13 @@ from os import path, rename, remove
 from config import NOT_USING_PYCAMERA, recordings_dir, static_folder
 from utils import append_log, clean_filename, iso_to_date
 from apscheduler.schedulers.background import BackgroundScheduler
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+log = logging.getLogger("CameraSystem")
 
 class RecordingsType(Enum):
     """Enumeration for the type of recording"""
@@ -37,48 +46,57 @@ class Camera:
         self.scheduler = BackgroundScheduler()
         self.recordings = {
             # If a value is empty, it means that the recording of type is not in progress
-            # The value is an iterable containing the filename and video writer object
+            # The value is an iterable containing the filename, video writer object, and frame count
             RecordingsType.MANUAL: [],
             RecordingsType.SCHEDULED_CLIP: [],
             RecordingsType.MOTION_CLIP: [],
         }
+        self.recording_lock = Lock()
+        log.info("Camera system initialized.")
 
     def __call__(self):
         return self.capcam
 
     def init_cam(self, width=None, height=None):
-        if not (width and height):
-            width, height = options.resolution
-
-        if self.testing_env:
-            self.capcam and self.capcam.release()
-            # self.capcam = cv2.VideoCapture(static_folder + "/test-video-greece.mp4")
-            self.capcam = cv2.VideoCapture(0)
-            self.capcam.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-            self.capcam.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-            self.resolution = width, height
-            
-            if self.capcam is None or not self.capcam.isOpened():
-                exit("Error: Could not open USB camera 0, is a webcam connected? Unset NOT_USING_PYCAMERA to use Picamera2")
-
-            return self
-
-        # Picamera2 module is used for Raspberry Pi camera module
-        # Manual: https://datasheets.raspberrypi.com/camera/picamera2-manual.pdf
-        if not self.capcam:
-            # Module might not be installed on non-Raspberry Pi environments
-            from picamera2 import Picamera2
-
-            self.capcam = Picamera2()
-        else:
-            self.capcam.stop()
-
-        print(f"Camera resolution set to {width}x{height}")
-        self.capcam.configure(self.capcam.create_video_configuration(main={"size": (width, height)}))
-        self.capcam.start()
-        self.resolution = width, height
-
-        return self
+        retry_count = 0
+        while retry_count < 5:
+            try:
+                if not (width and height):
+                    width, height = options.resolution
+                if self.testing_env:
+                    self.capcam and self.capcam.release()
+                    self.capcam = cv2.VideoCapture(0)
+                    self.capcam.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+                    self.capcam.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+                    self.resolution = width, height
+                    if self.capcam is None or not self.capcam.isOpened():
+                        log.error("[DEBUG] Could not open USB camera 0! Is a webcam connected?")
+                        raise Exception("Error: Could not open USB camera 0, is a webcam connected? Unset NOT_USING_PYCAMERA to use Picamera2")
+                    log.info(f"Camera initialized at {width}x{height}")
+                    if not hasattr(self, 'bg_thread') or not self.bg_thread.is_alive():
+                        self.bg_thread = Thread(target=self.background_capture_loop, daemon=True)
+                        self.bg_thread.start()
+                    return self
+                # Picamera2 module is used for Raspberry Pi camera module
+                if not self.capcam:
+                    from picamera2 import Picamera2
+                    self.capcam = Picamera2()
+                else:
+                    self.capcam.stop()
+                print(f"Camera resolution set to {width}x{height}")
+                self.capcam.configure(self.capcam.create_video_configuration(main={"size": (width, height)}))
+                self.capcam.start()
+                self.resolution = width, height
+                log.info(f"Camera initialized at {width}x{height}")
+                if not hasattr(self, 'bg_thread') or not self.bg_thread.is_alive():
+                    self.bg_thread = Thread(target=self.background_capture_loop, daemon=True)
+                    self.bg_thread.start()
+                return self
+            except Exception as e:
+                log.error(f"Camera init failed: {e}")
+                retry_count += 1
+                sleep(2)
+        raise Exception("Camera failed to initialize after retries.")
 
     def capture(self):
         if not self.testing_env:
@@ -125,67 +143,108 @@ class Camera:
         self.unpause() if self.paused else self.pause()
 
     def start_recording(self, type=RecordingsType.MANUAL, notify=True, rec_type="recording247"):
-        # No need to start recording if it's already in progress
+        # إذا كان هناك تسجيل نشط من نفس النوع، أوقفه أولًا
         if self.recordings.get(type):
-            return "Recording type in progress"
-        
-        codec = cv2.VideoWriter_fourcc(*"mp4v")
-        filename = path.join(recordings_dir, f"{datetime.now():%Y-%m-%d_%H-%M-%S}.{type.value}.processing.mp4")
-        writer = cv2.VideoWriter(filename, codec, 20, self.resolution)
-        self.recordings[type] = filename, writer
-        self.inform('recording', True) # Inform frontend
+            log.warning(f"Recording type {type} already in progress. Stopping previous recording.")
+            self.stop_recording(type)
+        for codec_name in ["mp4v", "XVID", "avc1"]:
+            codec = cv2.VideoWriter_fourcc(*codec_name)
+            filename = path.join(recordings_dir, f"{datetime.now():%Y-%m-%d_%H-%M-%S}.{type.value}.processing.mp4")
+            writer = cv2.VideoWriter(filename, codec, 20, self.resolution)
+            if writer.isOpened():
+                log.info(f"[DEBUG] VideoWriter opened with codec {codec_name} for {filename}")
+                break
+            else:
+                log.error(f"[DEBUG] VideoWriter failed to open with codec {codec_name} for {filename}")
+        else:
+            log.error(f"[DEBUG] All codecs failed for {filename}. Recording will not work!")
+            return "VideoWriter failed to open"
+        self.recordings[type] = [filename, writer, 0]  # Add frame count
+        self.inform('recording', True)
         print(f"Recording {type.value} to {filename}", self.recordings)
-
+        log.info(f"[MANUAL] Started recording: {filename}")
         if notify:
-            self.notify((type.value.replace(RecordingsType.MANUAL.value, "24/7")).capitalize() + \
-                # f" recording started to {path.basename(clean_filename(filename))}", log_type)
-                " recording started", rec_type)
+            self.notify((type.value.replace(RecordingsType.MANUAL.value, "24/7")).capitalize() + " recording started", rec_type)
+        log.info(f"Started recording: {filename}")
 
     def stop_recording(self, type=None, rm_type=True, rec_type="recording247"):
+        log.info(f"[DEBUG] stop_recording CALLED with type={type}, rm_type={rm_type}, rec_type={rec_type}")
         if type is None:
-            for type in RecordingsType:
-                if self.recordings.get(type):
-                    self.stop_recording(type)
+            for rec_type in RecordingsType:
+                if self.recordings.get(rec_type):
+                    self.stop_recording(rec_type)
+            log.info(f"[DEBUG] stop_recording: All recordings stopped.")
             return
-        
         if not self.recordings.get(type):
+            log.warning(f"[MANUAL] Tried to stop recording {type} but none in progress.")
             return print("Recording type not in progress")
-
-        filename, writer = self.recordings[type]
-
-        # Rename the file to remove the 'processing' suffix etc.
+        filename, writer, frame_count = self.recordings[type]
         new_name = clean_filename(filename)
-        rename(filename, new_name)
-        
-        writer: cv2.VideoWriter
-        writer.release()
-        
+        with self.recording_lock:
+            writer: cv2.VideoWriter
+            writer.release()
+            try:
+                rename(filename, new_name)
+            except Exception as e:
+                log.error(f"[DEBUG] Failed to rename {filename} to {new_name}: {e}")
+        MIN_FRAMES = 10
+        if frame_count < MIN_FRAMES or not os.path.exists(new_name):
+            if os.path.exists(new_name):
+                os.remove(new_name)
+            if rm_type:
+                del self.recordings[type]
+            print(f"Recording {new_name} discarded (too short or empty)")
+            log.warning(f"[MANUAL] Recording {new_name} discarded (too short or empty)")
+            log.info(f"[DEBUG] stop_recording: Recording {type} discarded.")
+            return
         if rm_type:
             del self.recordings[type]
-
         self.inform('recording', False)
-        self.notify((type.value.replace(RecordingsType.MANUAL.value, "24/7")).capitalize() + \
-                # f" recording started to {path.basename(clean_filename(filename))}", log_type)
-                " recording done", rec_type)
-
-        # Convert all .mp4v files to Browser-compatible .mp4 files
+        self.notify((type.value.replace(RecordingsType.MANUAL.value, "24/7")).capitalize() + " recording done", rec_type)
+        log.info(f"[DEBUG] stop_recording: Recording {type} stopped and file saved.")
         import moviepy.editor as moviepy
         import multiprocessing
-
-        # Load the video file
         clip = moviepy.VideoFileClip(new_name)
-
-        # Get the number of CPU cores
         num_cores = multiprocessing.cpu_count()
-        
-        # clip.write_videofile(new_name + ".tmp.mp4", codec='libx264')
         clip.write_videofile(new_name + ".tmp.mp4", codec='libx264', threads=num_cores, preset='ultrafast')
         clip.close()
-
-        # Old file is no longer needed
         remove(new_name)
         rename(new_name + ".tmp.mp4", new_name)
-
+        log.info(f"[MANUAL] Stopped recording: {new_name}, frames written: {frame_count}")
+        if frame_count < MIN_FRAMES or not os.path.exists(new_name):
+            log.warning(f"Recording {new_name} was too short or empty and was deleted.")
+        else:
+            log.info(f"Recording {new_name} saved successfully.")
+        # تحديث recordings.json بعد حفظ الفيديو
+        try:
+            import json
+            json_path = os.path.join('frontend/public/recordings', 'recordings.json')
+            if os.path.exists(json_path):
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+            else:
+                data = []
+            # أضف الفيديو إذا لم يكن موجودًا
+            base_name = os.path.basename(new_name)
+            if not any(rec.get('name') == base_name for rec in data):
+                # استخراج معلومات الفيديو
+                size_mb = round(os.path.getsize(new_name) / 1_000_000, 2)
+                cap = cv2.VideoCapture(new_name)
+                frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                fps = cap.get(cv2.CAP_PROP_FPS)
+                duration = round(frame_count / fps, 1) if fps > 0 else 0
+                cap.release()
+                data.append({
+                    'name': base_name,
+                    'url': f"/recordings/{base_name}",
+                    'date': str(datetime.now().strftime('%Y-%m-%d %H:%M')),
+                    'duration': f"{duration}s",
+                    'size': f"{size_mb} MB"
+                })
+                with open(json_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            log.error(f"Failed to update recordings.json: {e}")
 
     def start_motion_recording(self):
         if self.recordings.get(RecordingsType.MOTION_CLIP):
@@ -284,12 +343,14 @@ class Camera:
 
             # (x, y, w, h) = cv2.boundingRect(contour)
             # cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            log.info("Motion detected! Starting recording...")
             self.start_motion_recording()
             return gray2.copy()
         
         return gray2.copy()
 
     def match_option(self, key, value):
+        log.info(f"[DEBUG] match_option CALLED with key={key}, value={value}")
         """
         Check if the key matches any of the options, perform the necessary action if possible,
         and return message title and description of the action performed/will be performed.
@@ -314,8 +375,18 @@ class Camera:
                 if any(v < 100 for v in value):
                     title, desc, successful = "Invalid resolution", "Resolution must be at least 100x100", False
         elif key == 'recording247':
-            msg = self.start_recording() if value else self.stop_recording(RecordingsType.MANUAL)
-            title, desc, successful = ("Recording error", msg, 0) if msg else (f"Recording {'on' if value else 'off'}", f"24/7 recording {'enabled' if value else 'disabled'}", 1)
+            if value:
+                msg = self.start_recording()
+                from options import options as _options
+                _options.update_option('recording247', True)
+                _options.reload()
+                title, desc, successful = ("Recording error", msg, 0) if msg else ("Recording on", "24/7 recording enabled", 1)
+            else:
+                msg = self.stop_recording(RecordingsType.MANUAL, rec_type="recording247")
+                from options import options as _options
+                _options.update_option('recording247', False)
+                _options.reload()
+                title, desc, successful = ("Recording off", "24/7 recording disabled", 1)
         elif key == 'fliporientation':
             # Some options just need to be toggled, which is done where this function is called, so we just return the title and description
             title = "Camera " + ("flipped" if value else "unflipped")
@@ -399,62 +470,86 @@ class Camera:
         
         return combined
 
-    def gen_frames(self):
-
+    def background_capture_loop(self):
         _, first_frame = self.capture()
         frist_gray_frame = cv2.cvtColor(first_frame, cv2.COLOR_BGR2GRAY)
         frist_gray_frame = cv2.GaussianBlur(frist_gray_frame, (21, 21), 0)
+        while True:
+            try:
+                if self.paused:
+                    sleep(0.1)
+                    continue
+                ret, frame = self.capture()
+                if not ret:
+                    log.error("[DEBUG] No frame captured from camera!")
+                    sleep(0.1)
+                    continue
+                else:
+                    log.info("[DEBUG] Frame captured from camera.")
+                # (Optional) Add privacy, flip, etc. if needed
+                if options.shape:
+                    hsva = options.shape['hsva']
+                    hsva_adjusted = {
+                        **hsva,
+                        's': hsva['s'] * 70,
+                        'v': hsva['v'] * 1.5,
+                    }
+                    try:
+                        frame = self.add_privacy_shape(frame, {**options.shape, 'hsva': hsva_adjusted})
+                    except Exception as e:
+                        log.error(f"Privacy zone blur failed: {e}")
+                if options.fliporientation:
+                    frame = cv2.flip(frame, -1)
+                with self.recording_lock:
+                    for rec_type, recording in self.recordings.items():
+                        if recording:
+                            recording[1].write(frame)
+                            recording[2] += 1
+                            log.info(f"[DEBUG] Frame written to {recording[0]}")
+                            if recording[2] == 1:
+                                log.info(f"First frame written to {recording[0]}")
+                sleep(1/20)  # match FPS
+            except Exception as e:
+                log.error(f"Error in background_capture_loop: {e}")
+                sleep(1)
 
+    def gen_frames(self):
+        _, first_frame = self.capture()
+        frist_gray_frame = cv2.cvtColor(first_frame, cv2.COLOR_BGR2GRAY)
+        frist_gray_frame = cv2.GaussianBlur(frist_gray_frame, (21, 21), 0)
         while not self.paused:
-            # Capture frame-by-frame
-            ret, frame = self.capture()
-
-            if not ret:
-                continue
-
-            # If self.motion_sensor is enabled, detection should be done by IR sensor at the bottom
-            if options.motiondetection and not self.paused and not self.using_pir_sensor:
-                if self.resolution_chnaged:
-                    # If the resolution has changed, the frame shape must be updated
-                    frist_gray_frame = cv2.resize(frist_gray_frame, self.resolution)
-                    self.resolution_chnaged = False
-                frist_gray_frame = self.detect_motion(frame, frist_gray_frame.copy())
-
-            # If shape is defined, apply the backdrop blur effect
-            if options.shape:
-                # Adjust HSV values slightly to make them more vibrant to match with browser preview
-                hsva = options.shape['hsva']
-                hsva_adjusted = {
-                    **hsva,
-                    's': hsva['s'] * 70,
-                    'v': hsva['v'] * 1.5,
-                }
-
-                # Apply the blur to the region specified by the shape
-                frame = self.add_privacy_shape(frame, {**options.shape, 'hsva': hsva_adjusted})
-
-            # Flip the upside down if enabled
-            if options.fliporientation:
-                frame = cv2.flip(frame, -1)
-
-            # Write the frame to all recording files
-            # for _, writer in self.recordings.values():
-                # writer.write(frame)
-            
-            # Write the frame to all recording files
-            for recording in self.recordings.values():
-                if recording:
-                    recording[1].write(frame)
-                
-            # Store last frame shape as options.resolution may not be the actual frame shape
-            self.resolution = frame.shape[:2][::-1]
-
-            # Encode the frame in JPEG format
-            ret, buffer = cv2.imencode('.jpg', frame)
-
-            # Convert to bytes and yield the frame
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            try:
+                ret, frame = self.capture()
+                if not ret:
+                    log.warning("Failed to capture frame from camera.")
+                    continue
+                # (Optional) Motion detection, privacy, flip, etc. as before
+                if options.motiondetection and not self.paused and not self.using_pir_sensor:
+                    if self.resolution_chnaged:
+                        frist_gray_frame = cv2.resize(frist_gray_frame, self.resolution)
+                        self.resolution_chnaged = False
+                    frist_gray_frame = self.detect_motion(frame, frist_gray_frame.copy())
+                if options.shape:
+                    hsva = options.shape['hsva']
+                    hsva_adjusted = {
+                        **hsva,
+                        's': hsva['s'] * 70,
+                        'v': hsva['v'] * 1.5,
+                    }
+                    try:
+                        frame = self.add_privacy_shape(frame, {**options.shape, 'hsva': hsva_adjusted})
+                    except Exception as e:
+                        log.error(f"Privacy zone blur failed: {e}")
+                if options.fliporientation:
+                    frame = cv2.flip(frame, -1)
+                # Remove frame writing from here (now handled by background thread)
+                self.resolution = frame.shape[:2][::-1]
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            except Exception as e:
+                log.error(f"Error in gen_frames loop: {e}")
+                sleep(1)
 
 
 # testing_env is True when running on a non-Raspberry Pi environment and thus using a usb webcam instead of Picamera
@@ -485,3 +580,14 @@ if cam_utils.using_pir_sensor:
 
     pir.when_motion = on_motion
     pir.when_no_motion = on_no_motion
+
+# Clean up broken files on startup
+for file in os.listdir(recordings_dir):
+    if file.endswith('.mp4'):
+        file_path = os.path.join(recordings_dir, file)
+        cap = cv2.VideoCapture(file_path)
+        frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        cap.release()
+        if frames < 10:
+            os.remove(file_path)
+            print(f"Deleted broken recording: {file}")

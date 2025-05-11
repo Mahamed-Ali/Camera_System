@@ -31,7 +31,9 @@ export default defineConfig({
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
         secure: false,
-      }
+      },
+      '/logs': 'http://localhost:5000',
+      '/logs/clear': 'http://localhost:5000',
     }
   }
 })

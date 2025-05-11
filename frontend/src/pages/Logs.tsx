@@ -2,8 +2,12 @@ import ActivityLogs from '../components/ActivityLogsDrawer'
 
 export default function Logs() {
   return (
-    <div className="flex justify-center items-start mt-4">
-      <ActivityLogs />
+    <div className="h-full bg-black">
+      <div className="h-full overflow-y-auto">
+        <div className="p-6">
+          <ActivityLogs />
+        </div>
+      </div>
     </div>
   )
 }

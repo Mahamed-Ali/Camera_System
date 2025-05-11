@@ -26,7 +26,7 @@ export default function Content() {
       <div className='video [&:not(:hover)>_.feed-controls]:hidden' data-msg={opts.serverPaused || (!opts.serverOnline && 'Server offline') || undefined}>
         {additionalOption.zones && <PrivacyZoneShape feedImgRef={feedImgRef} />}
         {/* <img className="feed t2" src="https://unsplash.it/752/565" alt="feed" ref={feedImgRef} /> */}
-        <img className={clsx("feed t2", { hidden: !opts.lastUpdated })} src="http://127.0.0.1:5000/feed" alt="" ref={feedImgRef} />
+        <img className={clsx("feed t2", { hidden: !opts.lastUpdated })} src="http://127.0.0.1:5000/feed" alt="Live camera feed" ref={feedImgRef} />
         <div className={clsx("feed-controls shows-up relative h-0 grid place-content-center", { hidden: opts.serverPaused || !opts.lastUpdated })}>
           <div className="controls bg-background2 dark:shadow-none shadow-xl min-w-[150px] h-[30px] rounded-[100px] flex place-content-center cursor-pointer" onClick={() => socket.emit('pause')}>
             <div className="play-pause grid place-content-center">
